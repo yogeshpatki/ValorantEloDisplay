@@ -1,14 +1,5 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -56,7 +47,7 @@ export default function RankProgress(props) {
       const matches = res.Matches;
       let currentRP, rankNum, diff;
       const validMatches = matches.filter(game => {
-          return game['CompetitiveMovement'] != 'MOVEMENT_UNKNOWN';
+          return game['CompetitiveMovement'] !== 'MOVEMENT_UNKNOWN';
       });
 
       if(validMatches && validMatches.length) {
@@ -65,7 +56,7 @@ export default function RankProgress(props) {
           diff = validMatches[0]["TierProgressAfterUpdate"] - validMatches[0]["TierProgressBeforeUpdate"];
       }
       
-      return {rank: ranks[rankNum], elo: (rankNum * 100) - 300 + currentRP, currentRP,diff};
+      return {rank: ranks[rankNum], elo: (rankNum * 100) - 300 + currentRP, currentRP,diff,rankNum};
     }
   };
   const rankDetails = (rankRes, logout) => {
@@ -75,7 +66,7 @@ export default function RankProgress(props) {
       <Typography component="h1" variant="h5" className={classes.text}>
           Current Rank
       </Typography>
-      <div className={classes.rankLogo} style={{backgroundImage: `url(../10.png)`}}> </div>
+      <div className={classes.rankLogo} style={{backgroundImage: `url(../${rankDetails.rankNum}.png)`}}> </div>
       <Typography component="h4" >
         Rank Progress
       </Typography>

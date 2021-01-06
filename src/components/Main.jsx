@@ -63,7 +63,6 @@ export default function Main() {
       top: `${50}%`,
       left: `${50}%`,
       transform: 'translate(-50%, -50%)',
-      color: 'white',
       width: '50%',
       padding: '2em'
     };
@@ -82,8 +81,8 @@ export default function Main() {
       <p id="simple-modal-description">
         This project was inspired by <a href="https://github.com/RumbleMike/ValorantStreamOverlay">RumbleMike</a>
         And I only intend to provide my fellow Valorant players with some insight on their rank progress. 
-        If you don't want this tool to be out there, Please email me on ypatki7@gmail.com. 
-        Entire source code of this web application is available on <a href="www.github.com/yogeshpatki">Github</a>, and it does not store any of the data 
+        If you don't want this tool to be out there, Please dm me on Twitter: @yogesh_p7
+        Entire source code of this web application is available on <a href="https://github.com/yogeshpatki/ValorantEloDisplay/">Github</a>, and it does not store any of the data 
         entered by the user for any intents or purposes. Much Love.
       </p>
     </div>
