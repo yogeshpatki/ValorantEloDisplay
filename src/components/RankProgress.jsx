@@ -66,7 +66,7 @@ export default function RankProgress(props) {
       <Typography component="h1" variant="h5" className={classes.text}>
           Current Rank
       </Typography>
-      <div className={classes.rankLogo} style={{backgroundImage: `url(../${rankDetails.rankNum}.png)`}}> </div>
+      <div className={classes.rankLogo} style={{backgroundImage: `url(../${rankDetail.rankNum}.png)`}}> </div>
       <Typography component="h4" >
         Rank Progress
       </Typography>
