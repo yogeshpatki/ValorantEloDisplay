@@ -4,23 +4,22 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import LinearWithValueLabel from './LinearWithValueLabel';
-import { Card } from '@material-ui/core';
+import { Card, Grid } from '@material-ui/core';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    '& div': {
-      margin: '0.2em'
-    },
-    height: '600px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
     backgroundColor: 'transparent',
-    color: 'white'
+    color: 'white',
+    textAlign: 'center'
 
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    backgroundColor: '#6c3fb582',
+    color: '#ddd'
+  },
+  refresh: {
     backgroundColor: '#6c3fb582',
     color: '#ddd'
   },
@@ -28,13 +27,10 @@ const useStyles = makeStyles((theme) => ({
     color: 'white'
   },
   rankLogo: {
-    height: '120px',
-    width: '100px',
     backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat'
-  },
-  eloProgress: {
-    width: '100%'
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    height: '120px'
   }
 }));
 
@@ -45,7 +41,7 @@ export default function RankProgress(props) {
   const getDetails = res => {
     if(res.Matches) {
       const matches = res.Matches;
-      let currentRP, rankNum, diff;
+      let currentRP, rankNum, diff,elo;
       const validMatches = matches.filter(game => {
           return game['CompetitiveMovement'] !== 'MOVEMENT_UNKNOWN';
       });
@@ -54,44 +50,84 @@ export default function RankProgress(props) {
           currentRP = validMatches[0]["TierProgressAfterUpdate"];
           rankNum = validMatches[0]["TierAfterUpdate"];
           diff = validMatches[0]["TierProgressAfterUpdate"] - validMatches[0]["TierProgressBeforeUpdate"];
+          elo = (rankNum * 100) - 300 + currentRP;
+      }
+
+      if(validMatches.length >= 2) {
+        const previousMatch = validMatches[1];
+        const prevRP = previousMatch["TierProgressAfterUpdate"];
+        const prevRankNum = previousMatch["TierAfterUpdate"];
+        const prevElo = (prevRankNum * 100) - 300 + prevRP;
+        diff = elo - prevElo;
       }
       
-      return {rank: ranks[rankNum], elo: (rankNum * 100) - 300 + currentRP, currentRP,diff,rankNum};
+      return {rank: ranks[rankNum], elo, currentRP,diff,rankNum};
     }
   };
-  const rankDetails = (rankRes, logout) => {
+  const rankDetails = (rankRes, logout, refresh) => {
     const rankDetail = getDetails(rankRes);
     return (
-    <Card className={classes.paper}>
-      <Typography component="h1" variant="h5" className={classes.text}>
-          Current Rank
-      </Typography>
-      <div className={classes.rankLogo} style={{backgroundImage: `url(../${rankDetail.rankNum}.png)`}}> </div>
-      <Typography component="h4" >
-        Rank Progress
-      </Typography>
-      <LinearWithValueLabel color="green" progress={rankDetail.currentRP} className={classes.eloProgress}/> 
-      <div>ELO : {rankDetail.elo}</div> 
-      <Typography component="h4" >
-        Last Match : {rankDetail.diff < 0 ? 'Lost' : 'Earned'} {Math.abs(rankDetail.diff)} Elo Points
-      </Typography>
-      <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-          onClick={ () => logout()}
+        <Grid container 
+        spacing={1}
+        direction="row"
+        alignItems="center"
+        justify="center"
+        className={classes.paper}
         >
-        Go Back
-      </Button>
-    </Card>
+          <Grid item xs={12}>
+            <Typography component="h1" variant="h5" className={classes.text}>
+                Current Rank
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <div className={classes.rankLogo} style={{backgroundImage: `url(../${rankDetail.rankNum}.png)`}}> </div>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography component="h4" >
+              Rank Progress
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+          <LinearWithValueLabel color="green" progress={rankDetail.currentRP} className={classes.eloProgress}/> 
+          </Grid>
+          <Grid item xs={12}>
+          <div>ELO : {rankDetail.elo}</div> 
+          </Grid>
+          <Grid item xs={12}>
+          <Typography component="h4" >
+            Last Match : {rankDetail.diff < 0 ? 'Lost' : 'Earned'} {Math.abs(rankDetail.diff)} Elo Points
+          </Typography>
+          </Grid>
+          <Grid item xs={6}>
+          <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.refresh}
+              onClick={ () => refresh()}
+            >
+            <RefreshIcon></RefreshIcon>
+          </Button>
+          </Grid>
+          <Grid item xs={6}>
+          <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={ () => logout()}
+            >
+            <ExitToAppIcon></ExitToAppIcon>
+          </Button>
+          </Grid>
+        </Grid>
     );
   }
   const classes = useStyles();
   
   return (
     <Container component="main" maxWidth="xs">
-      { props.res && props.res.Matches ? <div> {rankDetails(props.res, props.logout)} </div> : <div> Please login to see your ELO details </div>}
+      { props.res && props.res.Matches ? <div> {rankDetails(props.res, props.logout, props.refresh)} </div> : <div> Please login to see your ELO details </div>}
     </Container>
   );
 }

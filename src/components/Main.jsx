@@ -95,7 +95,7 @@ export default function Main() {
   const userSignIn = async (username, password) => {
     setstate({...state, loginState: LOGGING_IN});
     const res = await login(username, password);
-    setstate({loginState: LOGGED_IN, response: res});
+    setstate({loginState: LOGGED_IN, response: res, username, password});
   };
 
   const loginDisplay = () => {
@@ -156,7 +156,10 @@ export default function Main() {
         <CircularProgress /> 
          : state.loginState === NOT_LOGGED_IN ? loginDisplay() 
          : <RankProgress 
-              res={state.response} 
+              res={state.response}
+              refresh={() => {
+                userSignIn(state.username, state.password)
+              }} 
               logout={
                 () => {
                   setstate({...state, loginState:NOT_LOGGED_IN})
