@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import LinearWithValueLabel from './LinearWithValueLabel';
-import { Card, Grid } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import RefreshIcon from '@material-ui/icons/Refresh';
 
@@ -30,7 +30,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
-    height: '120px'
+    height: '120px',
+    animationName: 'spin',
+    animationDuration: '2500ms',
+    animationIterationCount: '5',
+    animationTimingFunction: 'ease-int-out' 
   }
 }));
 
