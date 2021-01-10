@@ -11,6 +11,7 @@ import RankProgress from './RankProgress';
 import { login } from '../util/riotUtils';
 import { CircularProgress, Paper } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
+import Notification from './Notification';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -75,7 +76,7 @@ export default function Main() {
     setOpen(false);
   };
 
-  const body = (
+  const modalBody = (
     <div style={modalStyle}>
       <h2 id="simple-modal-title">Hi Team</h2>
       <p id="simple-modal-description">
@@ -95,7 +96,11 @@ export default function Main() {
   const userSignIn = async (username, password) => {
     setstate({...state, loginState: LOGGING_IN});
     const res = await login(username, password);
-    setstate({loginState: LOGGED_IN, response: res, username, password});
+    if(res.error) {
+      setstate({loginState: NOT_LOGGED_IN, failedLogin: true, errorMessage: res.message});
+    } else {
+      setstate({loginState: LOGGED_IN, response: res, username, password});
+    }
   };
 
   const loginDisplay = () => {
@@ -169,6 +174,7 @@ export default function Main() {
 
       }
       </Paper>
+      {state.loginState === NOT_LOGGED_IN && state.failedLogin ? (<Notification open={state.failedLogin} message={state.errorMessage} />) : ''}
     </Container>
     <footer className={classes.footer}>
     Are you from RIOT and don't like this tool? Click 
@@ -185,7 +191,7 @@ export default function Main() {
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
       >
-        {body}
+        {modalBody}
       </Modal>
     </footer>
     </>

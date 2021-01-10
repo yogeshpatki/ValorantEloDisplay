@@ -17,22 +17,38 @@ app.get('/', function (req, res) {
 
 
 app.post('/rankData', async (req, res) => {
-  const authResponse = await authorize();
-  //console.log(authResponse.headers.raw()['set-cookie']);
-  const asid = getCookiesFromResposne(authResponse, 'asid');
-  const authResponse2 = await authenticate(req, asid);
-  const ssid = getCookiesFromResposne(authResponse2, 'ssid');
-  const userId = getCookiesFromResposne(authResponse2, 'sub').split('=')[1];
+  let authResponse, asid, authResponse2, ssid, userId, js, accessToken, entRes, entResJson, entitlementToken, rankInfoRes, jsonRankInfo;
+  try {
+    authResponse = await authorize();
+    asid = getCookiesFromResposne(authResponse, 'asid');
+  } catch (err) {
+    res.send({error: true, err, message: "Failed To Authorise, something wrong with Config or RIOT servers"});
+  }
+  try {  
+    authResponse2 = await authenticate(req, asid);
+    ssid = getCookiesFromResposne(authResponse2, 'ssid');
+    userId = getCookiesFromResposne(authResponse2, 'sub').split('=')[1];
+    js = await authResponse2.json();
+    accessToken = js.response.parameters.uri.split('access_token=')[1].split('&scope')[0];
+  } catch (err) {
+    res.send({error: true, err, message: "Failed To Login, verify that your username and password is correct. If the error persists, Try again later."});
+  }
   //console.log({ssid});
   //console.log({userId});
-  const js = await authResponse2.json();
-  const accessToken = js.response.parameters.uri.split('access_token=')[1].split('&scope')[0];
-  const entRes = await getEntitlementToken(ssid, accessToken);
-  const entResJson = await entRes.json();
-  const entitlementToken = entResJson["entitlements_token"];
+  try {
+    entRes = await getEntitlementToken(ssid, accessToken);
+    entResJson = await entRes.json();
+    entitlementToken = entResJson.entitlements_token;
+  } catch (err) {
+    res.send({error: true, err, message: "Failed To Fetch entitlement Token, But login was successful. Try again later."});
+  }
   //console.log({entResJson});
-  const rankInfoRes = await getRankInfo(ssid, accessToken, entitlementToken, userId);
-  const jsonRankInfo = await rankInfoRes.json();
+  try {
+    rankInfoRes = await getRankInfo(ssid, accessToken, entitlementToken, userId);
+    jsonRankInfo = await rankInfoRes.json();
+  } catch(err) {
+    res.send({error: true, err, message: "Failed To Fetch Recent Match Details, But login was successful. Try again later."});
+  }
   //console.log({jsonRankInfo});
   res.send(jsonRankInfo);
 });
